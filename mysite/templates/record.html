@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+
+<body>
+  {% block content %}
+
+
+  <style type="text/css">
+    .layui-table-cell {
+      height: inherit;
+    }
+  </style>
+
+
+
+  <div class="demoTable">
+    工号：
+    <div class="layui-inline">
+      <input class="layui-input" name="id" id="demoReload" autocomplete="off">
+    </div>
+    <!-- 实际点检日:
+          <div class="layui-inline">
+            <input type="text" class="layui-input" id="demoReload3" placeholder="yyyy-MM-dd">
+          </div> -->
+    <button class="layui-btn" data-type="reload">搜索</button>
+  </div>
+
+
+  <table class="layui-hide" id="test" lay-filter="test" lay-size="sm"></table>
+
+  <script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+      <button class="layui-btn layui-btn-sm" lay-event="getCheckData">批量删除</button>
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="add">新增数据</button> -->
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>
+          <button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全选</button> -->
+    </div>
+  </script>
+
+  <script type="text/html" id="barDemo">
+    <!-- <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a> -->
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+  </script>
+
+
+  <script>
+    layui.use(['table', 'laydate'], function () {
+      var $ = layui.jquery
+      var table = layui.table;
+      var laydate = layui.laydate;
+      laydate.render({
+        elem: '#demoReload3'
+      });
+
+      table.render({
+        elem: '#test',
+        url: '/record_pc_api/',
+        toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+          ,
+        defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+          title: '提示',
+          layEvent: 'LAYTABLE_TIPS',
+          icon: 'layui-icon-tips'
+        }],
+        title: '答题记录表',
+        cols: [
+          [{
+              type: 'checkbox',
+              fixed: 'left'
+            }, {
+              field: 'id',
+              title: 'ID',
+              width: 80,
+              fixed: 'left',
+              unresize: true,
+              sort: true
+            }, {
+              field: 'psn',
+              title: '工号',
+              width: 80,
+              sort: true
+            }, {
+              field: 'title_name',
+              title: '题目',
+              sort: true
+            }
+            // ,{field:'answer', title:'答案',width:200, sort: true }
+            , {
+              field: 'score',
+              title: '得分',
+              width: 80,
+              sort: true
+            }, {
+              field: 'create_time',
+              title: '创建时间',
+              width: 200,
+              sort: true
+            }, {
+              // fixed: 'right',
+              title: '操作',
+              toolbar: '#barDemo',
+              width: 60
+            }
+          ]
+        ],
+        page: true,
+        limit: 20,
+        limits: [20, 40, 60, 100,300,500,700,1000],
+        even: true,
+        size:'sm',
+        id: 'testReload'
+      });
+
+      //查询重载
+      var $ = layui.$,
+        active = {
+          reload: function () {
+            var demoReload = $('#demoReload');
+            var demoReload2 = $('#demoReload2');
+            var demoReload3 = $('#demoReload3');
+            //执行重载
+            table.reload('testReload', {
+              page: {
+                curr: 1 //重新从第 1 页开始
+              },
+              where: {
+
+                psn: demoReload.val()
+                // ,uloc:demoReload2.val()
+                // ,res_time:demoReload3.val()
+
+              }
+            }, 'data');
+          }
+        };
+
+      $('.demoTable .layui-btn').on('click', function () {
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+      });
+
+      //头工具栏事件
+      table.on('toolbar(test)', function (obj) {
+        var checkStatus = table.checkStatus(obj.config.id);
+        switch (obj.event) {
+          case 'getCheckData':
+            var data = checkStatus.data;
+            layer.confirm('是否确认删除', function (index) {
+              $.ajax({
+                url: "/record_delete_api/",
+                type: "POST",
+                data: {
+                  data: JSON.stringify(data)
+                }
+              })
+
+              layer.close(index);
+              window.location.reload();
+            })
+            break;
+          case 'getCheckLength':
+            var data = checkStatus.data;
+            layer.msg('选中了：' + data.length + ' 个');
+            break;
+          case 'isAll':
+            layer.msg(checkStatus.isAll ? '全选' : '未全选');
+            break;
+
+            //自定义头工具栏右侧图标 - 提示
+          case 'LAYTABLE_TIPS':
+            layer.alert('这是工具栏右侧自定义的一个图标按钮');
+            break;
+          case 'add':
+            layer.open({
+              type: 1,
+              title: "新增数据",
+              area: ['600px', '600px'],
+              content: $("#adddate"),
+
+            });
+        };
+      });
+
+      //监听行工具事件
+      table.on('tool(test)', function (obj) {
+        var data = obj.data;
+        //console.log(obj)
+        if (obj.event === 'del') {
+          layer.confirm('是否确认删除', function (index) {
+            $.ajax({
+              url: "/record_delete_api/",
+              type: "POST",
+              data: {
+                id: data.id
+              }
+            });
+
+            obj.del();
+            layer.close(index);
+          });
+        } else if (obj.event === 'edit') {
+          layer.open({
+            type: 1,
+            title: "编辑数据",
+            area: ['600px', '600px'],
+            content: $("#popUpdateTest"),
+
+
+          });
+          // 打开表单并赋值
+          layui.use(['form', 'layedit', 'laydate'], function () {
+            var laydate = layui.laydate;
+            var form = layui.form;
+            //日期格式常规用法
+            // laydate.render({
+            //   elem: '#test1'
+            // });
+
+            // laydate.render({
+            //   elem: '#test2'
+            // });
+            // laydate.render({
+            //   elem: '#test3'
+            // });
+            // laydate.render({
+            //   elem: '#test4'
+            // });
+
+            //表单初始赋值
+            form.val('example', {
+              "id": data.id,
+              "name": data.name // "name": "value"
+                ,
+              "psnnumber_id": data.psnnumber_id,
+              "Worksection": data.Worksection,
+              "uloc": data.uloc //复选框选中状态
+                ,
+              "in_time": data.in_time //开关状态
+                ,
+              "three_finish_time": data.in_time,
+              "four_train_time": data.four_train_time,
+              "four_finish_time": data.four_finish_time
+            });
+          });
+        }
+      });
+    });
+  </script>
+
+
+
+  <!-- 编辑数据 -->
+  <div class="layui-row" id="popUpdateTest" style="display:none;">
+
+
+    <form class="layui-form" action="/update/" method="POST" lay-filter="example">
+
+      <div class="layui-form-item" style="display: none">
+
+        <label class="layui-form-label">ID:</label>
+
+        <div class="layui-input-block">
+          <input type="text" name="id" lay-verify="title" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">工号:</label>
+
+        <div class="layui-input-block">
+          <input type="text" name="psnnumber_id" lay-verify="title" autocomplete="off" placeholder="请输入"
+            class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-block">
+          <input type="text" name="name" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">工段</label>
+        <div class="layui-input-block">
+          <input type="text" name="Worksection" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">操作岗位</label>
+        <div class="layui-input-block">
+          <input type="text" name="uloc" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <div class="layui-inline"></div>
+        <label class="layui-form-label">入职时间</label>
+        <div class="layui-input-inline">
+          <input type="text" class="layui-input" id="test1" placeholder="yyyy-MM-dd" name="in_time">
+        </div>
+      </div>
+
+
+
+
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">是否在职</label>
+        <div class="layui-input-block">
+          <select name="interest" lay-filter="aihao">
+            <option value="1">在职</option>
+            <option value="0">离职</option>
+          </select>
+        </div>
+      </div>
+
+
+      <div class="layui-form-item">
+        <div class="layui-inline"></div>
+        <label class="layui-form-label">3/4完成时间</label>
+        <div class="layui-input-inline">
+          <input type="text" class="layui-input" id="test2" placeholder="yyyy-MM-dd" name="three_finish_time">
+        </div>
+      </div>
+
+
+      <div class="layui-form-item">
+        <div class="layui-inline"></div>
+        <label class="layui-form-label">4/4培训时间</label>
+        <div class="layui-input-inline">
+          <input type="text" class="layui-input" id="test3" placeholder="yyyy-MM-dd" name="four_train_time">
+        </div>
+      </div>
+
+
+      <div class="layui-form-item">
+        <div class="layui-inline"></div>
+        <label class="layui-form-label">4/4完成时间</label>
+        <div class="layui-input-inline">
+          <input type="text" class="layui-input" id="test4" placeholder="yyyy-MM-dd" name="four_finish_time">
+        </div>
+      </div>
+
+
+
+
+      <div class="layui-form-item">
+        <div class="layui-input-block">
+          <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- 新增数据 -->
+  <div class="layui-row" id="adddate" style="display:none;">
+
+
+    <form class="layui-form" action="/add/" method="POST" lay-filter="example">
+
+
+
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">工号:</label>
+
+        <div class="layui-input-block">
+          <input type="text" name="psnnumber_id" lay-verify="title" autocomplete="off" placeholder="请输入"
+            class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-block">
+          <input type="text" name="name" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">工段</label>
+        <div class="layui-input-block">
+          <input type="text" name="Worksection" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">操作岗位</label>
+        <div class="layui-input-block">
+          <input type="text" name="uloc" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <div class="layui-inline"></div>
+        <label class="layui-form-label">入职时间</label>
+        <div class="layui-input-inline">
+          <input type="text" class="layui-input" id="test5" placeholder="yyyy-MM-dd" name="in_time">
+        </div>
+      </div>
+
+
+
+
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">是否在职</label>
+        <div class="layui-input-block">
+          <select name="interest" lay-filter="aihao">
+            <option value="1">在职</option>
+            <option value="0">离职</option>
+          </select>
+        </div>
+      </div>
+
+
+      <div class="layui-form-item">
+        <div class="layui-inline"></div>
+        <label class="layui-form-label">3/4完成时间</label>
+        <div class="layui-input-inline">
+          <input type="text" class="layui-input" id="test6" placeholder="yyyy-MM-dd" name="three_finish_time">
+        </div>
+      </div>
+
+
+      <div class="layui-form-item">
+        <div class="layui-inline"></div>
+        <label class="layui-form-label">4/4培训时间</label>
+        <div class="layui-input-inline">
+          <input type="text" class="layui-input" id="test7" placeholder="yyyy-MM-dd" name="four_train_time">
+        </div>
+      </div>
+
+
+      <div class="layui-form-item">
+        <div class="layui-inline"></div>
+        <label class="layui-form-label">4/4完成时间</label>
+        <div class="layui-input-inline">
+          <input type="text" class="layui-input" id="test8" placeholder="yyyy-MM-dd" name="four_finish_time">
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <div class="layui-input-block">
+          <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+  {% endblock %}
+
+</body>
+
+</html>
