@@ -70,10 +70,19 @@
               field: 'id',
               title: 'ID',
               width: 80,
+              hide: true,
               fixed: 'left',
               unresize: true,
               sort: true
             }, {
+
+              title: '序号',
+              width: 80,
+              type: 'numbers',
+              unresize: true,
+              sort: true
+            },
+            {
               field: 'psn',
               title: '工号',
               width: 80,
@@ -104,9 +113,9 @@
         ],
         page: true,
         limit: 20,
-        limits: [20, 40, 60, 100,300,500,700,1000],
+        limits: [20, 40, 60, 100, 300, 500, 700, 1000, 5000],
         even: true,
-        size:'sm',
+        size: 'sm',
         id: 'testReload'
       });
 

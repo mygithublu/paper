@@ -15,7 +15,7 @@
 <button type="button" class="layui-btn" id="uploaduser">
   <i class="layui-icon">&#xe67c;</i>导入
 </button>
-
+<button id="downtemplates" class="layui-btn layui-btn-normal">模板下载</button>
 <table class="layui-hide" id="test" lay-filter="test"></table>
 
 
@@ -24,17 +24,17 @@
 
 
 <script type="text/html" id="toolbarDemo">
-    <div class="layui-btn-container" id="layerDemo">
-      <button class="layui-btn layui-btn-sm" lay-event="getCheckData">批量删除</button>
-      <!-- <button class="layui-btn layui-btn-sm" lay-event="add">新增数据</button> -->
-      <!-- <button class="layui-btn layui-btn-sm" data-method="offset" data-type="auto">新增数据</button> -->
-      <!-- <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>
+  <div class="layui-btn-container" id="layerDemo">
+    <button class="layui-btn layui-btn-sm" lay-event="getCheckData">批量删除</button>
+    <!-- <button class="layui-btn layui-btn-sm" lay-event="add">新增数据</button> -->
+    <!-- <button class="layui-btn layui-btn-sm" data-method="offset" data-type="auto">新增数据</button> -->
+    <!-- <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>
           <button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全选</button> -->
-    </div>
-  </script>
+  </div>
+</script>
 
 <script type="text/html" id="barDemo">
-    <!-- <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a> -->
+  <!-- <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a> -->
 <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 </script>
 
@@ -46,6 +46,15 @@
     var laydate = layui.laydate;
     var layer = layui.layer;
 
+    $('#downtemplates').on('click', function () {
+      
+      window.location='/user_templates_download/';
+
+      
+    });
+
+
+
 
     layui.use('upload', function () {
       var $ = layui.jquery,
@@ -56,7 +65,7 @@
         elem: '#uploaduser',
         url: '/user_upload_file/',
         accept: 'file' //普通文件
-        ,
+          ,
         field: 'myfile',
         exts: 'xlsx|xls',
         before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
@@ -77,7 +86,7 @@
       elem: '#test',
       url: '/user_pc_api/',
       toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
-      ,
+        ,
       defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
         title: '提示',
         layEvent: 'LAYTABLE_TIPS',
@@ -86,49 +95,59 @@
       title: '用户数据表',
       cols: [
         [{
-          type: 'checkbox',
-          fixed: 'left'
-        }, {
-          field: 'id',
-          title: 'ID',
-          width: 80,
-          fixed: 'left',
-          unresize: true,
-          sort: true
-        }, {
-          field: 'psn',
-          title: '工号',
-          sort: true
-        }, {
-          field: 'name',
-          title: '姓名',
-          sort: true
-        }, {
-          field: 'title_class',
-          title: '区分',
-          sort: true
-        }, {
-          field: 'total',
-          title: '累计总分',
-          sort: true
-        }, {
-          field: 'today_total',
-          title: '当天得分',
-          sort: true
-        }, {
-          field: 'rank',
-          title: '排名',
-          sort: true
-        }, {
-          field: 'create_time',
-          title: '创建时间',
-          sort: true
-        }, {
-          fixed: 'right',
-          title: '操作',
-          toolbar: '#barDemo',
-          width: 60
-        }]
+            type: 'checkbox',
+            fixed: 'left'
+          }, {
+            field: 'id',
+            title: 'ID',
+            width: 80,
+            hide: true,
+            fixed: 'left',
+            unresize: true,
+            sort: true
+          }, {
+
+            title: '序号',
+            width: 80,
+            type: 'numbers',
+            unresize: true,
+            sort: true
+          },
+          {
+            field: 'psn',
+            title: '工号',
+            sort: true
+          }, {
+            field: 'name',
+            title: '姓名',
+            sort: true
+          }, {
+            field: 'title_class',
+            title: '区分',
+            sort: true
+          }, {
+            field: 'total',
+            title: '累计总分',
+            sort: true
+          }, {
+            field: 'today_total',
+            title: '当天得分',
+            sort: true
+          }, {
+            field: 'rank',
+            title: '排名',
+            sort: true
+          }, {
+            field: 'create_time',
+            title: '创建时间',
+            sort: true
+          }, {
+            fixed: 'right',
+            title: '操作',
+            toolbar: '#barDemo',
+            width: 60
+          }
+        ]
       ],
       page: true,
       limit: 18,
@@ -192,7 +211,7 @@
           layer.msg(checkStatus.isAll ? '全选' : '未全选');
           break;
 
-        //自定义头工具栏右侧图标 - 提示
+          //自定义头工具栏右侧图标 - 提示
         case 'LAYTABLE_TIPS':
           layer.alert('这是工具栏右侧自定义的一个图标按钮');
           break;
@@ -256,13 +275,13 @@
           form.val('example', {
             "id": data.id,
             "name": data.name // "name": "value"
-            ,
+              ,
             "psnnumber_id": data.psnnumber_id,
             "Worksection": data.Worksection,
             "uloc": data.uloc //复选框选中状态
-            ,
+              ,
             "in_time": data.in_time //开关状态
-            ,
+              ,
             "three_finish_time": data.in_time,
             "four_train_time": data.four_train_time,
             "four_finish_time": data.four_finish_time
@@ -278,24 +297,29 @@
     //触发事件
     var active = {
       offset: function (othis) {
-        var type = othis.data('type')
-          , text = othis.text();
+        var type = othis.data('type'),
+          text = othis.text();
 
         layer.open({
-          type: 1
-          , offset: type //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
-          , id: 'layerDemo' + type //防止重复弹出
-          , content: $('#adddate').html()
-          , closeBtn: 2
-          , area: ['600px', '600px']
-          , btn: ['提交', '取消']
-          , btnAlign: 'c' //按钮居中
-          , shade: 0.8 //不显示遮罩
-          , moveType: 1 //拖拽模式，0或者1
-          , yes: function () {
+          type: 1,
+          offset: type //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+            ,
+          id: 'layerDemo' + type //防止重复弹出
+            ,
+          content: $('#adddate').html(),
+          closeBtn: 2,
+          area: ['600px', '600px'],
+          btn: ['提交', '取消'],
+          btnAlign: 'c' //按钮居中
+            ,
+          shade: 0.8 //不显示遮罩
+            ,
+          moveType: 1 //拖拽模式，0或者1
+            ,
+          yes: function () {
             layer.closeAll();
-          }
-          , btn2: function () {
+          },
+          btn2: function () {
             layer.closeAll();
           }
         });
@@ -303,7 +327,8 @@
     };
 
     $('#layerDemo .layui-btn').on('click', function () {
-      var othis = $(this), method = othis.data('method');
+      var othis = $(this),
+        method = othis.data('method');
       active[method] ? active[method].call(this, othis) : '';
     });
 
@@ -330,7 +355,7 @@
 
 
     <div class="layui-form-item">
-      <label class="layui-form-label">工号:</label>
+      <label class="layui-form-label">用户名:</label>
 
       <div class="layui-input-block">
         <input type="text" name="psnnumber_id" lay-verify="title" autocomplete="off" placeholder="请输入"

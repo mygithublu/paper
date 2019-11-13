@@ -38,5 +38,7 @@ urlpatterns = [
     url(r'user_delete_api/',user_delete_api),
     url(r'title_delete_api/',title_delete_api),
     url(r'record_delete_api/',record_delete_api),
-    url(r'record_delete_api/',record_delete_api)
+    url(r'record_delete_api/',record_delete_api),
+    url(r'user_templates_download',user_templates_download),
+    url(r'ti_templates_download',ti_templates_download),
 ]

@@ -6,7 +6,7 @@ import numpy as np
 from numpy import nan as NaN
 import os
 import json
-
+from django.http import FileResponse #文件下载
 # Create your views here.
 
 
@@ -66,12 +66,16 @@ def ti_api(request):
     title_class=p[0]['title_class']
 
     #查询没有答过的题目，每次获取一条
-    date=title.objects.exclude(id__in=record_mark.objects.all().values_list('title_id',flat = True)).filter(title_class=title_class)[:1].values()
+    # date=title.objects.exclude(id__in=record_mark.objects.all().values_list('title_id',flat = True)).filter(title_class=title_class)[:1].values()
+    # 20191024区分用户和区分
+    date=title.objects.exclude(id__in=record_mark.objects.filter(psn=psn).values_list('title_id',flat = True)).filter(title_class=title_class)[:1].values()
     data['ti']=list(date)
 
+   
+    # count=title.objects.exclude(id__in=record_mark.objects.all().values_list('title_id',flat = True)).count()
     #获取条数
-    count=title.objects.exclude(id__in=record_mark.objects.all().values_list('title_id',flat = True)).count()
-
+    # 20191024区分用户和区分
+    count=title.objects.exclude(id__in=record_mark.objects.filter(psn=psn).values_list('title_id',flat = True)).filter(title_class=title_class).count()
 
     data['total']=total
     data['count']=count
@@ -353,3 +357,18 @@ def tt_upload_file(request):
     data['msg']=""
     data['data']='ok'
     return JsonResponse(data)
+
+def user_templates_download(request):
+    file=open('D:/paper/templates/user.xlsx','rb')
+    response =FileResponse(file)
+    response['Content-Type']='application/octet-stream'
+    response['Content-Disposition']='attachment;filename="user.xlsx"'
+    return response
+
+
+def ti_templates_download(request):
+    file=open('D:/paper/templates/paper.xlsx','rb')
+    response =FileResponse(file)
+    response['Content-Type']='application/octet-stream'
+    response['Content-Disposition']='attachment;filename="paper.xlsx"'
+    return response

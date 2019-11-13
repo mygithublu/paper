@@ -5,7 +5,7 @@
 
 
   <style type="text/css">
- 
+
 
   </style>
 
@@ -30,10 +30,12 @@
           </div> -->
     <button class="layui-btn" data-type="reload">搜索</button>
   </div>
-  &nbsp;&nbsp;&nbsp;
-  <button type="button" class="layui-btn" id="uploadtitle">
+  
+  <br>
+  &nbsp;&nbsp;&nbsp;<button type="button" class="layui-btn" id="uploadtitle">
     <i class="layui-icon">&#xe67c;</i>导入
   </button>
+  <button id="downtemplates" class="layui-btn layui-btn-normal">模板下载</button>
 
   <table class="layui-hide" id="test" lay-filter="test"></table>
 
@@ -61,6 +63,13 @@
         elem: '#demoReload3'
       });
 
+      $('#downtemplates').on('click', function () {
+     
+      window.location='/ti_templates_download/';
+
+      
+    });
+
       layui.use('upload', function () {
         var $ = layui.jquery,
           upload = layui.upload;
@@ -78,7 +87,7 @@
           },
           done: function (res) {
             layer.closeAll('loading'); //关闭loading
-            window.location.reload(); 
+            window.location.reload();
           }
         });
 
@@ -98,74 +107,84 @@
         title: '题目',
         cols: [
           [{
-            type: 'checkbox',
-          }, {
-            field: 'id',
-            title: 'ID',
-            width: 80,
-            // unresize: true,
-            sort: true
-          }, {
-            field: 'title_name',
-            title: '题目',
-            sort: true
-          }, {
-            field: 'title_class',
-            title: '区分',
-            width: 80,
-            sort: true
-          }, {
-            field: 'title_type',
-            title: '题型',
-            width: 80,
-            sort: true
-          }, {
-            field: 'A',
-            title: 'A选项',
-            width: 100,
-            sort: true
-          }, {
-            field: 'B',
-            title: 'B选项',
-            width: 100,
-            sort: true
-          }, {
-            field: 'C',
-            title: 'C选项',
-            width: 100,
-            sort: true
-          }, {
-            field: 'D',
-            title: 'D选项',
-            width: 100,
-            sort: true
-          }, {
-            field: 'answer',
-            title: '答案',
-            width: 100,
-            sort: true
-          }, {
-            field: 'score',
-            title: '分数',
-            width: 80,
-            sort: true
-          }, {
-            field: 'create_time',
-            title: '创建时间',
-            width: 200,
-            sort: true
-          }, {
-            // fixed: 'right',
-            title: '操作',
-            toolbar: '#barDemo',
-            width: 60
-          }]
+              type: 'checkbox',
+            }, {
+              field: 'id',
+              title: 'ID',
+              hide: true,
+              width: 80,
+              // unresize: true,
+              sort: true
+            }, {
+
+              title: '序号',
+              width: 80,
+              type: 'numbers',
+              unresize: true,
+              sort: true
+            },
+            {
+              field: 'title_name',
+              title: '题目',
+              sort: true
+            }, {
+              field: 'title_class',
+              title: '区分',
+              width: 80,
+              sort: true
+            }, {
+              field: 'title_type',
+              title: '题型',
+              width: 80,
+              sort: true
+            }, {
+              field: 'A',
+              title: 'A选项',
+              width: 100,
+              sort: true
+            }, {
+              field: 'B',
+              title: 'B选项',
+              width: 100,
+              sort: true
+            }, {
+              field: 'C',
+              title: 'C选项',
+              width: 100,
+              sort: true
+            }, {
+              field: 'D',
+              title: 'D选项',
+              width: 100,
+              sort: true
+            }, {
+              field: 'answer',
+              title: '答案',
+              width: 100,
+              sort: true
+            }, {
+              field: 'score',
+              title: '分数',
+              width: 80,
+              sort: true
+            }, {
+              field: 'create_time',
+              title: '创建时间',
+              width: 200,
+              sort: true
+            }, {
+              // fixed: 'right',
+              title: '操作',
+              toolbar: '#barDemo',
+              width: 60
+            }
+          ]
         ],
         page: true,
         limit: 20,
-        limits: [20, 40, 60, 100,300,500,700,1000],
+        limits: [20, 40, 60, 100, 300, 500, 700, 1000, 5000],
         even: true,
-        size:'sm',
+        size: 'sm',
         id: 'testReload'
       });
 
